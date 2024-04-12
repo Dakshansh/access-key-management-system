@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 import { AccessKeyM1Service } from './access-key-m1.service';
 import { CreateAccessKeyDto } from './dto/create.access-key.dto';
-import { AccessKey } from './schemas/access-key.schema';
+import { AccessKey } from '@app/common';
 import { UpdateAccessKeyDto } from './dto/update.access-key.dto';
 
 @Controller("/api/access-keys")

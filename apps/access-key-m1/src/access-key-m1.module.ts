@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AccessKeyM1Controller } from './access-key-m1.controller';
 import { AccessKeyM1Service } from './access-key-m1.service';
-import { DatabaseModule } from '@app/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from "joi";
-import { AccessKeyRepository } from './repositories/access-key.repository';
-import { AccessKey, AccessKeySchema } from './schemas/access-key.schema';
+import { AccessKeyRepository,DatabaseModule,AccessKey, AccessKeySchema } from '@app/common';
+
 
 
 @Module({

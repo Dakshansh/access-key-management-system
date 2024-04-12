@@ -1,9 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectConnection, InjectModel } from "@nestjs/mongoose";
 import { Model, Connection, Types, SaveOptions } from "mongoose";
-
-import { AbstractRepository } from "@app/common";
-import { AccessKey } from "../schemas/access-key.schema";
+import { AbstractRepository,AccessKey } from "@app/common";
 
 @Injectable()
 export class AccessKeyRepository extends AbstractRepository<AccessKey> {

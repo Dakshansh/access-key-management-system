@@ -1,12 +1,18 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { TokenInformationM2Service } from './token-information-m2.service';
-
-@Controller()
+import { RateLimitGuard } from '@app/common';
+import { Logger } from '@nestjs/common';
+@Controller('api/tokens')
+// @UseGuards(UserSpecificThrottlerGuard)
 export class TokenInformationM2Controller {
-  constructor(private readonly tokenInformationM2Service: TokenInformationM2Service) {}
+  private readonly logger = new Logger(TokenInformationM2Controller.name);
+  constructor(
+    private readonly tokenInformationM2Service: TokenInformationM2Service,
+  ) {}
 
-  @Get()
-  getHello(): string {
-    return this.tokenInformationM2Service.getHello();
+  @UseGuards(RateLimitGuard)
+  @Get('get-token-info/:key')
+  async getAccessKeyDetails(@Param('key') key: string): Promise<any> {
+    return await this.tokenInformationM2Service.getTokenInfo(key);
   }
 }

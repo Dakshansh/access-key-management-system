@@ -1,8 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import {
+  AccessKeyRepository,
+  CustomThrottlerStorageService,
+} from '@app/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
 @Injectable()
 export class TokenInformationM2Service {
-  getHello(): string {
-    return 'Hello World!';
+  private readonly logger = new Logger(TokenInformationM2Service.name);
+  constructor() {}
+
+  async getTokenInfo(key: string) {
+    try {
+      if (!key) {
+        throw new NotFoundException('Access key not found');
+      }
+
+      return { token: 'mock-token', userId: 'mock-user-id' };
+    } catch (err) {
+      this.logger.error(`Error fetching token information for key: ${key}`);
+      throw err;
+    }
   }
 }

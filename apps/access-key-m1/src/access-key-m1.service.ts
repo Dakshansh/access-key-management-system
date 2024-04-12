@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateAccessKeyDto } from './dto/create.access-key.dto';
-import { AccessKey } from './schemas/access-key.schema';
-import { AccessKeyRepository } from './repositories/access-key.repository';
+import { AccessKey } from '@app/common';
+import { AccessKeyRepository } from '../../../libs/common/src/repositories/access-key.repository';
 import { generateUniqueKey } from '@app/common';
 import { UpdateAccessKeyDto } from './dto/update.access-key.dto';
 
