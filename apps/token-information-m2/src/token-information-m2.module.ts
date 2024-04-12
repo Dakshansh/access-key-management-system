@@ -9,7 +9,7 @@ import {
   DatabaseModule,
   RateLimitGuard,
 } from '@app/common';
-import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
@@ -24,14 +24,14 @@ import * as Joi from 'joi';
       isGlobal: true,
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
-        // PORT: Joi.number().required(),
+        PORT: Joi.number().required(),
       }),
       envFilePath: './apps/token-information-m2/.env',
     }),
     ThrottlerModule.forRootAsync({
       useFactory: () => [
         {
-          ttl: 10,
+          ttl: 60,
           limit: 5,
         },
       ],

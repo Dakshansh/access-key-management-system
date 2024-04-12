@@ -1,20 +1,35 @@
-import { ForbiddenException, Logger, NotFoundException } from "@nestjs/common";
-import { FilterQuery, Model, Types, UpdateQuery, SaveOptions, Connection, QueryOptions, MongooseBulkWriteOptions } from "mongoose";
-import { AbstractDocument } from "./abstract.schema";
-// import { DuplicateDocumentException } from "../exceptions/duplicate-document.exception";
-
+import { ForbiddenException, Logger, NotFoundException } from '@nestjs/common';
+import {
+  FilterQuery,
+  Model,
+  Types,
+  UpdateQuery,
+  SaveOptions,
+  Connection,
+  QueryOptions,
+  MongooseBulkWriteOptions,
+} from 'mongoose';
+import { AbstractDocument } from './abstract.schema';
 export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   protected abstract readonly logger: Logger;
 
-  constructor(protected readonly model: Model<TDocument>, private readonly connection: Connection) {}
+  constructor(
+    protected readonly model: Model<TDocument>,
+    private readonly connection: Connection,
+  ) {}
 
-  async create(document: Omit<TDocument, "_id">, options?: SaveOptions): Promise<TDocument> {
+  async create(
+    document: Omit<TDocument, '_id'>,
+    options?: SaveOptions,
+  ): Promise<TDocument> {
     try {
       const createdDocument = new this.model({
         ...document,
         _id: new Types.ObjectId(),
       });
-      return (await createdDocument.save(options)).toJSON() as unknown as TDocument;
+      return (
+        await createdDocument.save(options)
+      ).toJSON() as unknown as TDocument;
     } catch (err) {
       if (err && err.code === 11000) {
         throw new ForbiddenException();
@@ -23,13 +38,18 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     }
   }
 
-  async createPartial(document: Partial<TDocument>, options?: SaveOptions): Promise<TDocument> {
+  async createPartial(
+    document: Partial<TDocument>,
+    options?: SaveOptions,
+  ): Promise<TDocument> {
     try {
       const createdDocument = new this.model({
         ...document,
         _id: new Types.ObjectId(),
       });
-      return (await createdDocument.save(options)).toJSON() as unknown as TDocument;
+      return (
+        await createdDocument.save(options)
+      ).toJSON() as unknown as TDocument;
     } catch (err) {
       if (err && err.code === 11000) {
         throw new ForbiddenException();
@@ -38,18 +58,29 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     }
   }
 
-  async findOne(filterQuery: FilterQuery<TDocument>, options?: QueryOptions): Promise<TDocument> {
-    const document = await this.model.findOne(filterQuery, {}, { ...options, lean: true });
+  async findOne(
+    filterQuery: FilterQuery<TDocument>,
+    options?: QueryOptions,
+  ): Promise<TDocument> {
+    const document = await this.model.findOne(
+      filterQuery,
+      {},
+      { ...options, lean: true },
+    );
 
     if (!document) {
-      this.logger.warn("Document not found with filterQuery", filterQuery);
-      throw new NotFoundException("Document not found.");
+      this.logger.warn('Document not found with filterQuery', filterQuery);
+      throw new NotFoundException('Document not found.');
     }
 
     return document;
   }
 
-  async findOneAndUpdate(filterQuery: FilterQuery<TDocument>, update: UpdateQuery<TDocument>, options?: SaveOptions) {
+  async findOneAndUpdate(
+    filterQuery: FilterQuery<TDocument>,
+    update: UpdateQuery<TDocument>,
+    options?: SaveOptions,
+  ) {
     const document = await this.model.findOneAndUpdate(filterQuery, update, {
       new: true,
       ...options,
@@ -57,7 +88,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
 
     if (!document) {
       this.logger.warn(`Document not found with filterQuery:`, filterQuery);
-      throw new NotFoundException("Document not found.");
+      throw new NotFoundException('Document not found.');
     }
 
     return document;
@@ -68,16 +99,24 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
 
     if (response.deletedCount === 0) {
       this.logger.warn(`Document not found with filterQuery:`, filterQuery);
-      throw new NotFoundException("Document not found.");
+      throw new NotFoundException('Document not found.');
     }
   }
 
-  async updateMany(filterQuery: FilterQuery<TDocument>, update: UpdateQuery<TDocument>, options?: SaveOptions) {
+  async updateMany(
+    filterQuery: FilterQuery<TDocument>,
+    update: UpdateQuery<TDocument>,
+    options?: SaveOptions,
+  ) {
     const result = await this.model.updateMany(filterQuery, update, options);
     return result;
   }
 
-  async upsert(filterQuery: FilterQuery<TDocument>, document: Partial<TDocument>, options?: SaveOptions) {
+  async upsert(
+    filterQuery: FilterQuery<TDocument>,
+    document: Partial<TDocument>,
+    options?: SaveOptions,
+  ) {
     return this.model.findOneAndUpdate(filterQuery, document, {
       lean: true,
       upsert: true,
@@ -98,28 +137,16 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return this.model.distinct(field, filterQuery);
   }
 
-  async find(filterQuery: FilterQuery<TDocument>, fields: any = {}, options?: QueryOptions) {
+  async find(
+    filterQuery: FilterQuery<TDocument>,
+    fields: any = {},
+    options?: QueryOptions,
+  ) {
     return this.model.find(filterQuery, fields, { lean: true, ...options });
-  }
-
-  async findAndPaginateTransactions(filterQuery: FilterQuery<TDocument>, fields: any = {}, limit: number = 10, page: number = 1, customSort: any = {}) {
-    return this.model
-      .find(filterQuery, fields)
-      .sort(Object.keys(customSort).length > 0 ? { ...customSort } : { _id: -1 })
-      .skip(limit * (page - 1))
-      .limit(limit);
   }
 
   async count(filterQuery: FilterQuery<TDocument>, options?: QueryOptions) {
     return this.model.countDocuments(filterQuery, options);
-  }
-
-  async deleteAll() {
-    return this.model.deleteMany();
-  }
-
-  async deleteMany(filterQuery: FilterQuery<TDocument>, options?: SaveOptions) {
-    return this.model.deleteMany(filterQuery, options);
   }
 
   async exists(filterQuery: FilterQuery<TDocument>, options?: SaveOptions) {
@@ -130,11 +157,5 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     } catch (err) {
       return false;
     }
-  }
-
-  async startTransaction() {
-    const session = await this.connection.startSession();
-    session.startTransaction();
-    return session;
   }
 }
