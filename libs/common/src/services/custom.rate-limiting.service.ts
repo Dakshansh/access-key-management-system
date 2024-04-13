@@ -1,9 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+  Logger,
+} from '@nestjs/common';
 import { ThrottlerStorage } from '@nestjs/throttler';
 import { AccessKeyRepository } from '@app/common';
 
 @Injectable()
 export class CustomThrottlerStorageService implements ThrottlerStorage {
+  private readonly logger = new Logger(CustomThrottlerStorageService.name);
   constructor(private readonly accessKeyRepository: AccessKeyRepository) {}
 
   private requests = new Map<string, { value: number; expiresAt: Date }>();
@@ -23,6 +30,7 @@ export class CustomThrottlerStorageService implements ThrottlerStorage {
   }
 
   async increment(key: string, ttl: number): Promise<any> {
+    this.logger.warn(`increment function not implemented`);
     throw new Error('Not implemented');
   }
 
@@ -48,7 +56,23 @@ export class CustomThrottlerStorageService implements ThrottlerStorage {
 
     const accessKey = await this.accessKeyRepository.findOne({ key });
     if (!accessKey) {
-      throw new Error('Invalid access key');
+      this.logger.warn(
+        `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Invalid Access Key`,
+      );
+      throw new NotFoundException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Invalid Access Key',
+      });
+    }
+
+    if (accessKey.expirationDate < new Date()) {
+      this.logger.warn(
+        `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Key has expired with expiration time: ${accessKey.expirationDate}`,
+      );
+      throw new UnauthorizedException({
+        statusCode: HttpStatus.UNAUTHORIZED,
+        message: 'Key has expired',
+      });
     }
 
     if (request.value > accessKey.rateLimit) {

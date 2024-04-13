@@ -23,10 +23,14 @@ export class RateLimitGuard implements CanActivate {
     );
 
     if (isRateLimitExceeded) {
-      this.logger.warn(`Rate limit exceeded for key: ${key}`);
+      this.logger.warn(
+        `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Rate limit exceeded for key.`,
+      );
       throw new ForbiddenException('Rate limit exceeded');
     } else {
-      this.logger.log(`Request processed successfully for key: ${key}`);
+      this.logger.log(
+        `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Request processed successfully.`,
+      );
     }
     return true;
   }
