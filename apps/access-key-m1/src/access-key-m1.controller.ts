@@ -1,19 +1,31 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  UsePipes,
+} from '@nestjs/common';
 import { AccessKeyM1Service } from './access-key-m1.service';
 import { CreateAccessKeyDto } from './dto/create.access-key.dto';
-import { AccessKey } from '@app/common';
+import { AccessKey, CustomValidationPipe } from '@app/common';
 import { UpdateAccessKeyDto } from './dto/update.access-key.dto';
 
-@Controller("/api/access-keys")
+@Controller('/api/access-keys')
 export class AccessKeyM1Controller {
   constructor(private readonly accessKeyM1Service: AccessKeyM1Service) {}
 
-  @Post("create-key")
-  createAccessKey(@Body() createAccessKeyDto: CreateAccessKeyDto): Promise<AccessKey> {
+  @Post('create-key')
+  @UsePipes(CustomValidationPipe)
+  createAccessKey(
+    @Body() createAccessKeyDto: CreateAccessKeyDto,
+  ): Promise<AccessKey> {
     return this.accessKeyM1Service.createKey(createAccessKeyDto);
   }
 
-  @Get("get-all-keys")
+  @Get('get-all-keys')
   getAllAccessKeys(): Promise<AccessKey[]> {
     return this.accessKeyM1Service.getAllKeys();
   }
@@ -24,7 +36,10 @@ export class AccessKeyM1Controller {
   }
 
   @Put('update-key/:key')
-  updateAccessKey(@Param('key') key: string,@Body() updateAccessKeyDto: UpdateAccessKeyDto): Promise<AccessKey> {
+  updateAccessKey(
+    @Param('key') key: string,
+    @Body() updateAccessKeyDto: UpdateAccessKeyDto,
+  ): Promise<AccessKey> {
     return this.accessKeyM1Service.updateKey(key, updateAccessKeyDto);
   }
 

@@ -1,4 +1,13 @@
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsFutureDate } from './create.access-key.dto';
+
 export class UpdateAccessKeyDto {
-    rateLimit?: number;
-    expirationDate?: string;
-  }
+  @IsNotEmpty()
+  @IsNumber()
+  rateLimit?: number;
+
+  @IsNotEmpty()
+  @IsString()
+  @IsFutureDate()
+  expirationDate?: string;
+}

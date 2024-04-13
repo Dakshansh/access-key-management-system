@@ -6,3 +6,4 @@ export * from './schemas/access-key.schema';
 export * from './repositories/access-key.repository';
 export * from './guards/throttler.guard';
 export * from './services/custom.rate-limiting.service';
+export * from './pipes/custom.validation.pipe';

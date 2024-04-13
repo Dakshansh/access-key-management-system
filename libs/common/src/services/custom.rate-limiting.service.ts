@@ -54,9 +54,11 @@ export class CustomThrottlerStorageService implements ThrottlerStorage {
       request.value++;
     }
 
-    const accessKey = await this.accessKeyRepository.findOne({ key });
+    const accessKey = await this.accessKeyRepository
+      .findOne({ key })
+      .catch((err) => this.logger.error('Invalid Access Key'));
     if (!accessKey) {
-      this.logger.warn(
+      this.logger.error(
         `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Invalid Access Key`,
       );
       throw new NotFoundException({
@@ -66,7 +68,7 @@ export class CustomThrottlerStorageService implements ThrottlerStorage {
     }
 
     if (accessKey.expirationDate < new Date()) {
-      this.logger.warn(
+      this.logger.error(
         `Requested Key: ${key}, Timestamp: ${new Date()}, Result: Key has expired with expiration time: ${accessKey.expirationDate}`,
       );
       throw new UnauthorizedException({
